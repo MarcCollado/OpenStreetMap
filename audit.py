@@ -96,7 +96,7 @@ def audit_nodes(f):
                 # Its output is printed at the end of audit_nodes()
                 # all_keys, all_values = load_tag_map(tag, KS, VS)
 
-                # is_street_name() checks if the attribute k == addr:street
+                # is_street_name() checks if the attribute k = addr:street
                 if is_street_name(tag):
                     street_name = tag.attrib["v"]
                     audit_street_type(n_street_types, street_name)
@@ -267,7 +267,6 @@ def print_sorted_dict(d):
 
 
 def load_tag_map(t, ks, vs):
-
     k = t.attrib["k"]
     v = t.attrib["v"]
 
@@ -275,12 +274,10 @@ def load_tag_map(t, ks, vs):
         ks[k] += 1
     else:
         ks[k] = 1
-
     if v in vs:
         vs[v] += 1
     else:
         vs[v] = 1
-
     return ks, vs
 
 
@@ -298,7 +295,20 @@ def load_nodes_data(f):
     return
 
 
+def quick_print(f):
+    t = set()
+    for _, element in ET.iterparse(f):
+        if element.tag == "node":
+            # continue
+            for tag in element.iter("tag"):
+                # continue
+                if "addr:" in tag.attrib["k"]:
+                    t.add(tag.attrib["k"])
+    pprint.pprint(t)
+
+
 if __name__ == "__main__":
     with open("{}/{}".format(PATH, FILE), "r") as f:
-        audit_nodes(f)
-        audit_ways(f)
+        quick_print(f)
+        # audit_nodes(f)
+        # audit_ways(f)
