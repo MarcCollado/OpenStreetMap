@@ -21,7 +21,7 @@ The downloaded data was provided directly by Mapzen, since the area I intended t
 
 The project consists of three distinct parts:
 
-* Visualize and audit: carried out by the `audit.py` file, this section is intended to make sense of the data as a whole and assess its quality. This routine will programmatically check for data validity, accuracy and other measures seen throughout the course materials. This first part
+* Visualize and audit: carried out by the `audit.py` file, this section is intended to make sense of the data as a whole and assess its quality. This routine will programmatically check for data validity, accuracy and other measures seen throughout the course materials.
 * Spot and fix: `audit.py` will ultimately reveal problems with the map and provide the necessary information to create a data cleaning plan to execute on. This section will detail the problems encountered and the `fixme.py` file will address them.
 
 
@@ -121,9 +121,21 @@ According to the `export_schema.py`, ways will be mapped to the following schema
         * value
         * type
 
+
+### Other checks
+
+Finally, using a combination of the lighter `quick_print()` and `load_nodes_data()` functions, the data coming from all the tags containing the value "addr" will be evaluated for consistency.
+
+The routine will be looking for `postcode` of 5 digits, starting with 0, `city` names properly capitalized, `housenumber` matching integers and so forth.
+
+
 ## Part II: Spot and Fix
 
+After the programatic check performed by `audit.py` in the Barcelona area map, five types of problems have shown up:
 
+* Language inconsistency for street tags (*Calle* vs. *Carrer*)
+* Format disparity, case inconsistency, grammar mistakes and over­abbreviation for street tags (for the correct form *Carrer* there is: *C, CALLE, Calle, Carrar, Carrer, carrer, CR*)
+*
 
 ## Future Developments
 
