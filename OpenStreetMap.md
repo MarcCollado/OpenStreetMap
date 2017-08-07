@@ -27,7 +27,7 @@ The project consists of three distinct parts:
 
 ## Part I: Visualize and Audit
 
-In this part the data will be mapped out and visualized, programmatically checking for possible quality flaws. At the end of the day the data should be ready to fit a structure that will look like the schema found at `export_schema.py`.
+In this part the data will be mapped out and visualized, programmatically checking for possible quality flaws. At the end of the day the data should be ready to fit a structure that will look like the schema found at `schema.py`.
 
 The audit process will be mainly concerned by two data points: nodes and ways. Each element also contains relevant information within, that will be kept and translated to aforementioned data structure.
 
@@ -46,7 +46,7 @@ The node element can be found across the data file under the `<node></node>` tag
 </node>
 ```
 
-According to the `export_schema.py`, nodes will be mapped to the following schema:
+According to the `schema.py`, nodes will be mapped to the following schema:
 
 **Node Element Structure**
 
@@ -100,7 +100,7 @@ The way element can be found across the data file under the `<way></way>` tag an
 </way>
 ```
 
-According to the `export_schema.py`, ways will be mapped to the following schema:
+According to the `schema.py`, ways will be mapped to the following schema:
 
     **Way Element Structure**
 
@@ -133,9 +133,16 @@ The routine will be looking for `postcode` of 5 digits, starting with 0, `city` 
 
 After the programatic check performed by `audit.py` in the Barcelona area map, five types of problems have shown up:
 
-* Language inconsistency for street tags (*Calle* vs. *Carrer*)
-* Format disparity, case inconsistency, grammar mistakes and over­abbreviation for street tags (for the correct form *Carrer* there is: *C, CALLE, Calle, Carrar, Carrer, carrer, CR*)
-*
+* Language inconsistency for street types under the second level tag `""addr:street""` (*Avinguda* vs. *Avenida*)
+* Format disparity, case inconsistency, grammar mistakes and over­abbreviation for street types on second level tags `""addr:street""` (for the correct form *Carrer* there is: *C, CALLE, Calle, Carrar, Carrer, carrer, CR*)
+* Street type omission on second level tags `""addr:street""`, where the street name is displayed directly.
+* Cities `""addr:city""` out of range of the Barcelona metropolitan area.
+* Incorrect postal code: Barcelona area postal codes begin with 08XXX, but found some outside this range.
+
+
+### Language Inconsistency
+
+
 
 ## Future Developments
 
