@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import audit
-import compress
 import to_csv
 # import to_sql
 
