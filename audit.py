@@ -1,11 +1,10 @@
+# -*- coding: utf-8 -*-
 from collections import defaultdict
 import numpy
 import pprint
 import re
 import xml.etree.cElementTree as ET
 
-PATH = "../../_data"
-FILE = "bcn.min.osm"
 ATTR_INT = ['id', 'uid', 'version', 'changeset']
 
 # RegEx
@@ -302,13 +301,6 @@ def quick_print(f):
             # continue
             for tag in element.iter("tag"):
                 # continue
-                if "addr:" in tag.attrib["k"]:
-                    t.add(tag.attrib["k"])
+                if "addr:street" in tag.attrib["k"]:
+                    t.add(tag.attrib["v"])
     pprint.pprint(t)
-
-
-if __name__ == "__main__":
-    with open("{}/{}".format(PATH, FILE), "r") as f:
-        quick_print(f)
-        # audit_nodes(f)
-        # audit_ways(f)
