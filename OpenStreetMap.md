@@ -133,15 +133,25 @@ The routine will be looking for `postcode` of 5 digits, starting with 0, `city` 
 
 After the programatic check performed by `audit.py` in the Barcelona area map, five types of problems have shown up:
 
-* Language inconsistency for street types under the second level tag `""addr:street""` (*Avinguda* vs. *Avenida*)
-* Format disparity, case inconsistency, grammar mistakes and over­abbreviation for street types on second level tags `""addr:street""` (for the correct form *Carrer* there is: *C, CALLE, Calle, Carrar, Carrer, carrer, CR*)
-* Street type omission on second level tags `""addr:street""`, where the street name is displayed directly.
-* Cities `""addr:city""` out of range of the Barcelona metropolitan area.
+* Language inconsistency for street types under the second level tag `addr:street` (*Avinguda* vs. *Avenida*)
+* Format disparity, case inconsistency, grammar mistakes and over­abbreviation for street types on second level tags `addr:street` (for the correct form *Carrer* there is: *C, CALLE, Calle, Carrar, Carrer, carrer, CR*)
+* Street type omission on second level tags `addr:street`, where the street name is displayed directly.
+* Cities `addr:city` out of range of the Barcelona metropolitan area.
 * Incorrect postal code: Barcelona area postal codes begin with 08XXX, but found some outside this range.
 
 
 ### Language Inconsistency
 
+Because Barcelona has two official languages coexisting at the same time, is it possible to find some street prefixes still written in Spanish. Regardless the actual name remains the same, the city council enforces all the street prefixes to be written in Catalan, and that's exactly what `fix_lang()` does.
+
+```
+def fix_lang(st_type, st_name):
+    st_type_fix_lang = LANG_MAPPING[st_type.lower()]
+    street_fix_lang = st_type_fix_lang + ' ' + st_name
+    return street_fix_lang
+```
+
+It takes in the street name and street type, and then references LANG_MAPPING, a dictionary that contains all the possibles Spanish references to street types. Finally, it returns the correct name in Catalan.
 
 
 ## Future Developments
