@@ -90,11 +90,6 @@ def audit_nodes(f):
                 if not tag_qc(tag):
                     raise ValueError("Tag in node {} had too many attributes".format(node_id))
 
-                # load_tag_map() lists all keys and values found in tags. It is
-                # only intended for manual testing and correction purposes;
-                # Its output is printed at the end of audit_nodes()
-                # all_keys, all_values = load_tag_map(tag, KS, VS)
-
                 # is_street_name() checks if the attribute k = addr:street
                 if is_street_name(tag):
                     street_name = tag.attrib["v"]
@@ -265,6 +260,10 @@ def print_sorted_dict(d):
         print "%s: %d" % (k, v)
 
 
+# load_tag_map() lists all keys and values found in tags. It is
+# only intended for manual testing and correction purposes;
+# Its output is printed at the end of audit_nodes()
+# all_keys, all_values = load_tag_map(tag, KS, VS)
 def load_tag_map(t, ks, vs):
     k = t.attrib["k"]
     v = t.attrib["v"]
