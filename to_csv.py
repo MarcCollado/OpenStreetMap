@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
 import csv
 import codecs
 import pprint
 import re
 import xml.etree.cElementTree as ET
 import cerberus
+
+import fix
 import schema
 
 PATH = "../../_data"
@@ -28,93 +31,7 @@ WAY_TAGS_FIELDS = ['id', 'key', 'value', 'type']
 WAY_NODES_FIELDS = ['id', 'node_id', 'position']
 
 
-def shape_element(element, node_attr_fields=NODE_FIELDS,
-                  way_attr_fields=WAY_FIELDS,
-                  problem_chars=PROBLEMCHARS,
-                  default_tag_type='regular'):
-
-    node_attribs = {}
-    way_attribs = {}
-    way_nodes = []
-    tags = []
-
-    if element.tag == "node":
-
-        # NODE_FIELDS
-        for attr in element.attrib:
-            if attr in node_attr_fields:
-                node_attribs[attr] = element.attrib[attr]
-
-        # NODE_TAGS_FIELDS
-        tags = get_tags(element, node_attribs["id"])
-
-    if element.tag == "way":
-
-        # WAY_FIELDS
-        for attr in element.attrib:
-            if attr in way_attr_fields:
-                way_attribs[attr] = element.attrib[attr]
-
-        # WAY_TAGS_FIELDS
-        tags = get_tags(element, way_attribs["id"])
-
-        # WAY_NODES_FIELDS
-        i = 0
-        for nd in element.iter("nd"):
-            w = {}
-
-            # WAY_NODES_FIELDS[0]:id
-            w["id"] = way_attribs["id"]
-
-            # WAY_NODES_FIELDS[1]:node_id
-            w["node_id"] = nd.attrib["ref"]
-
-            # WAY_NODES_FIELDS[2]:position
-            w["position"] = i
-            i += 1
-
-            way_nodes.append(w)
-
-    if element.tag == 'node':
-        return {'node': node_attribs, 'node_tags': tags}
-    elif element.tag == 'way':
-        return {'way': way_attribs, 'way_nodes': way_nodes, 'way_tags': tags}
-
-
-def get_tags(element, uid,
-             problem_chars=PROBLEMCHARS,
-             default_tag_type='regular'):
-
-    tags = []
-    # NODE/WAY_TAGS_FIELDS
-    for tag in element.iter("tag"):
-        t = {}
-        # NODE/WAY_TAGS_FIELDS[0]:id
-        t["id"] = uid
-        # NODE/WAY_TAGS_FIELDS[1]:key
-        # NODE/WAY_TAGS_FIELDS[3]:type
-        k = tag.attrib["k"]
-        m = problem_chars.search(k)
-        if not m:
-            if ":" not in k:
-                t["key"] = k
-                t["type"] = default_tag_type
-            else:
-                cut = k.find(":") + 1
-                t["key"] = k[cut:]
-                t["type"] = k[:cut - 1]
-        else:
-            t["type"] = default_tag_type
-        # NODE/WAY_TAGS_FIELDS[2]:value
-        t["value"] = tag.attrib["v"]
-        tags.append(t)
-    return tags
-
-
-#               Main Function                        #
-# ================================================== #
 def process_map(file_in, validate):
-
     with codecs.open(NODES_PATH, 'w') as nodes_file, \
          codecs.open(NODE_TAGS_PATH, 'w') as nodes_tags_file, \
          codecs.open(WAYS_PATH, 'w') as ways_file, \
@@ -150,6 +67,54 @@ def process_map(file_in, validate):
                     way_tags_writer.writerows(el['way_tags'])
 
 
+def shape_element(element,
+                  node_attr_fields=NODE_FIELDS,
+                  way_attr_fields=WAY_FIELDS,
+                  problem_chars=PROBLEMCHARS,
+                  default_tag_type='regular'):
+
+    nodes = {}
+    ways = {}
+    way_nodes = []
+    tags = []
+
+    if element.tag == "node":
+        # Map node attributes according to schema
+        nodes = fix.map_node(element, node_attr_fields)
+        # Map node tags according to schema
+        tags = fix.get_tags(element, nodes["id"], PROBLEMCHARS, 'regular')
+
+    if element.tag == "way":
+        # Map way attributes according to schema
+        ways = fix.map_way(element, way_attr_fields)
+        # Map way tags according to schema
+        tags = fix.get_tags(element, ways["id"], PROBLEMCHARS, 'regular')
+
+        # WAY_NODES_FIELDS
+        i = 0
+        for nd in element.iter("nd"):
+            w = {}
+
+            # WAY_NODES_FIELDS[0]:id
+            # id maps to the top level way id attribute value
+            w["id"] = ways["id"]
+
+            # WAY_NODES_FIELDS[1]:node_id
+            # node_id maps to the ref attribute value of the nd tag
+            w["node_id"] = nd.attrib["ref"]
+
+            # WAY_NODES_FIELDS[2]:position
+            # position maps to the index starting at 0 of the nd tag
+            w["position"] = i
+            i += 1
+            way_nodes.append(w)
+
+    if element.tag == 'node':
+        return {'node': nodes, 'node_tags': tags}
+    elif element.tag == 'way':
+        return {'way': ways, 'way_nodes': way_nodes, 'way_tags': tags}
+
+
 # Helper Functions provided by Udacity
 def get_element(osm_file, tags=('node', 'way', 'relation')):
     context = ET.iterparse(osm_file, events=('start', 'end'))
@@ -181,8 +146,3 @@ class UnicodeDictWriter(csv.DictWriter, object):
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
-
-
-if __name__ == '__main__':
-    OSM_PATH = "{}/{}".format(PATH, FILE)
-    process_map(OSM_PATH, validate=False)
