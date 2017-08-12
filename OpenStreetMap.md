@@ -22,7 +22,8 @@ The downloaded data was provided directly by Mapzen, since the area I intended t
 The project consists of three distinct parts:
 
 * Visualize and audit: carried out by the `audit.py` file, this section is intended to make sense of the data as a whole and assess its quality. This routine will programmatically check for data validity, accuracy and other measures seen throughout the course materials.
-* Spot and fix: `audit.py` will ultimately reveal problems with the map and provide the necessary information to create a data cleaning plan to execute on. This section will detail the problems encountered and the `fixme.py` file will address them.
+* Spot and fix: `audit.py` will ultimately reveal problems with the map and provide the necessary information to create a data cleaning plan to execute on. This section will detail the problems encountered and the `fix.py` file will address them.
+* Visualizing the data: once audited and fixed, this last section consists on revealing the most interesting insights of the data.
 
 
 ## Part I: Visualize and Audit
@@ -153,7 +154,50 @@ def fix_lang(st_type, st_name):
 
 It takes in the street name and street type, and then references LANG_MAPPING, a dictionary that contains all the possibles Spanish references to street types. Finally, it returns the correct name in Catalan.
 
+For example, the entries such *"Avenida Diagonal"* become *"Avinguda Diagonal".*
 
-## Future Developments
 
-* `audit.py` split
+## Street types: Format problems
+
+The data contained several format problems, like over­abbreviation, typos and incorrect naming.
+
+First the data was screened with regular expressions and data type validation through `audit.py`. Once there was a clear view of the problems the data presented, they got fixed through `fix.py` functions, called via the `shape_element()` function found in `to_csv.py`.
+
+Finally, `fix.py` also implements some "hard-coded" data, such as `EXPECTED` or `MAPPING` to manually fix the errors not caught by the programatic functions. This sets are being updated in real time as more rare cases appear.
+
+
+## Street Type Omission and Uncaught Errors
+
+Once all the data has been filtered and processed, the last step is to find rare gems that were uncaught during the process and then, manually act on those by editing the data or creating an additional feature or function to deal with these edge cases.
+
+The `shape_element()` function is structured as a drip and starts filtering case by case:
+
+```
+if audit.is_street_name(tag):
+        st_type = get_street_type(v)
+        st_name = v[len(st_type) + 1:]
+
+        if st_type.lower() in LANG_MAPPING:
+            v = fix_lang(st_type, st_name)
+
+        elif st_type.lower() in EXPECTED:
+            st_type = fix_case(st_type)
+            st_name = fix_case(st_name)
+            v = st_type + " " + st_name
+
+        elif st_type.lower() in MAPPING:
+            st_type = MAPPING[st_type.lower()]
+            st_name = fix_case(st_name)
+            v = st_type + " " + st_name
+
+        else:
+            print "\nUNCAUGHT STREET TYPES", "\n", "="*20
+            print st_type + " " + st_name
+```
+
+Most of the scenarios were already discussed in the sections above, but the interesting part here is the `else:` statement.
+
+All the situations that were not properly filtered are set apart and printed in the terminal to examine what could exactly happen there in order to manually deal with them.
+
+
+## Part III: Visualizing the Data
