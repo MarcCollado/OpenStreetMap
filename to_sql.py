@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 import csv
-from pprint import pprint
 
 sqlite_file = 'osm.db'
 conn = sqlite3.connect(sqlite_file)
+conn.text_factory = str
 
 cur = conn.cursor()
 
@@ -111,10 +112,5 @@ cur.executemany('INSERT INTO way_tags(id, key, value, type) VALUES (?, ?, ?, ?);
 
 conn.commit()
 
-
-cur.execute('SELECT * FROM node_tags')
-all_rows = cur.fetchall()
-print('1):')
-pprint(all_rows)
 
 conn.close()
