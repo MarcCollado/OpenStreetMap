@@ -5,10 +5,10 @@ import audit
 
 street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
 
-EXPECTED = ["avinguda", "carrer", "camí", "carretera", "gran",
-            "parc", "passatge", "passeig",
-            "plaça".decode('utf-8'), "rambla",
-            "ronda", "travessera", "via"]
+EXPECTED = ["avinguda", "carrer", "camí", "carretera", "gran", "jardi",
+            "jardins", "mas", "moll", "parc", "passadís",
+            "passatge", "passeig", "plaça".decode('utf-8'), "polígon",
+            "rambla", "ronda", "travessera", "via"]
 
 LANG_MAPPING = {"acceso": "Accés",
                 "avenida": "Avinguda",
@@ -21,25 +21,37 @@ LANG_MAPPING = {"acceso": "Accés",
 
 MAPPING = {"av": "Avinguda",
            "av.": "Avinguda",
+           "avda": "Avinguda",
+           "avda.": "Avinguda",
            "c": "Carrer",
            "c.": "Carrer",
+           "c/": "Carrer",
            "carrar": "Carrer",
            "carrerde": "Carrer",
            "carrerl": "Carrer",
            "cl": "Carrer",
            "cr": "Carrer",
+           "cra": "Carretera",
            "ctra": "Carretera",
            "ctra.": "Carretera",
+           "carreralt": "Carretera",
+           "Pasatge": "Passatge",
            "pg.": "Passeig",
            "pg": "Passeig",
            "pas": "Passeig",
+           "paaseig": "Passeig",
            "pl.": "Plaça".decode('utf-8'),
            "pl": "Plaça".decode('utf-8'),
            "pla": "Plaça".decode('utf-8'),
-           "rembla": "Rambla"
+           "placa": "Plaça".decode('utf-8'),
+           "polígono": "Polígon",
+           "rbla.": "Rambla",
+           "rembla": "Rambla",
+           "Vía": "Via"
            }
 
-NON_CASE = ["de", "del", "la", "el", "i"]
+NON_CASE = ["de", "del", "la", "les", "el", "els", "i"]
+uncaught_st = set()
 
 # n_xxx keep track of the number of fixes applied to the data set
 n_fix_lang = 0
@@ -96,7 +108,9 @@ def get_tags(element, unique_id,
         v = tag.attrib["v"]
 
         if audit.is_postcode(tag):
-            if len(int(v)) != 5:
+            if len(v) != 5:
+                v = None
+            elif v[:2] != "08":
                 v = None
 
         if audit.is_street_name(tag):
@@ -117,8 +131,8 @@ def get_tags(element, unique_id,
                 v = st_type + " " + st_name
 
             else:
-                print "\nUNCAUGHT STREET TYPES", "\n", "="*21
-                print st_type  # + " " + st_name
+                st_type = fix_case(st_type)
+                uncaught_st.add(st_type)
 
         # value maps to the full "v" attribute
         t["value"] = v
@@ -138,12 +152,12 @@ def fix_case(s):
         if e in NON_CASE:
             d.append(e)
             continue
-
         if "\'" in e and len(e) > 3:
             p = e.find("\'")
-            temp = e[p-1].lower() + e[p] + e[p+1].upper() + e[p+2:].lower()
-            d.append(temp)
-            continue
+            if not e.endswith("\'"):
+                temp = e[p-1].lower() + e[p] + e[p+1].upper() + e[p+2:].lower()
+                d.append(temp)
+                continue
         else:
             temp = e[0].upper() + e[1:].lower()
             d.append(temp)
