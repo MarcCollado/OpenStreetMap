@@ -234,6 +234,10 @@ def is_street_name(t):
     return t.attrib["k"] == "addr:street"
 
 
+def is_postcode(t):
+    return t.attrib["k"] == "addr:postcode"
+
+
 def audit_street_type(street_types, street_name):
     st = street_name.split(' ', 1)[0]
     if st:
