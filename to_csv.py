@@ -9,9 +9,6 @@ import cerberus
 import fix
 import schema
 
-PATH = "../../_data"
-FILE = "bcn.min.osm"
-
 NODES_PATH = "output/node.csv"
 NODE_TAGS_PATH = "output/node_tags.csv"
 WAYS_PATH = "output/way.csv"
