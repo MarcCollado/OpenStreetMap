@@ -5,6 +5,7 @@ import pprint
 import re
 import xml.etree.cElementTree as ET
 
+# Values that can be cast integers
 ATTR_INT = ['id', 'uid', 'version', 'changeset']
 
 # RegEx
@@ -29,16 +30,12 @@ VS = dict()
 
 def audit_nodes(f):
 
+    # Used at the end of audit_nodes() to evaluate if the arrtib id is unique
     n_id = set()
-    n_street_types = defaultdict(int)
-    n_key_types = {"lower": 0, "lower_colon": 0, "problemchars": 0, "other": 0}
-
-    # Used at the end of audit_nodes() to evaluate if the arrtib if is unique
     total_nodes = 0
 
-    # load_nodes_data() collects each attribute from both nodes and tags into
-    # sets. It is only intended for manual testing with the numpy library.
-    # load_nodes_data(f)
+    n_street_types = defaultdict(int)
+    n_key_types = {"lower": 0, "lower_colon": 0, "problemchars": 0, "other": 0}
 
     for _, element in ET.iterparse(f):
 
@@ -61,7 +58,7 @@ def audit_nodes(f):
                 if not inRange(v, att):
                     raise ValueError("Detected out of range value for attrib.{} in node {}".format(att, node_id))
 
-            # Latitude and Longitude
+            # Assignment of Latitude and Longitude
             lat = element.attrib["lat"]
             lon = element.attrib["lon"]
 
@@ -75,7 +72,7 @@ def audit_nodes(f):
             if not inBCN(lat, lon):
                 raise ValueError("Invalid set of coordinates in node {}".format(node_id))
 
-            # Timestamp
+            # Assignment of Timestamp
             tstamp = element.attrib["timestamp"]
 
             # properDate() checks through a RegEx if a given timestamp follows
@@ -86,8 +83,8 @@ def audit_nodes(f):
             # For each node, loop through all its tags
             for tag in element.iter("tag"):
 
-                # tag_qc() checks if a tag element has 2 attributes (k, v)
-                if not tag_qc(tag):
+                # tag_has_two() checks if a tag element has 2 attributes (k, v)
+                if not tag_has_two(tag):
                     raise ValueError("Tag in node {} had too many attributes".format(node_id))
 
                 # is_street_name() checks if the attribute k = addr:street
@@ -98,8 +95,12 @@ def audit_nodes(f):
                 # audit_key_type() looks for format problems in the keys
                 audit_key_type(tag, n_key_types)
 
+    # Checks if all the parsed ids are unique
     if not len(n_id) == total_nodes:
         raise ValueError("Found attribte id not unique")
+
+    # ***** LOGS *****
+    # ================
 
     # Prints a list of all the keys found in tags
     # print "\nALL KEYS", "\n", "="*8
@@ -107,7 +108,6 @@ def audit_nodes(f):
     # Prints a list of all the values found in tags
     # print "\nALL VALUES", "\n", "="*10
     # pprint.pprint(all_values)
-
     # Prints a list of all the street types found in the data set
     print "\nNODES: STREET TYPES", "\n", "="*19
     print_sorted_dict(n_street_types)
@@ -117,60 +117,54 @@ def audit_nodes(f):
     return
 
 
+# Since audit_ways() shares most of its functions with audit_nodes(), code in
+# this function is not commented, for further reference check audit_nodes()
 def audit_ways(f):
 
     w_id = set()
+    total_ways = 0
+
     w_street_types = defaultdict(int)
     w_key_types = {"lower": 0, "lower_colon": 0, "problemchars": 0, "other": 0}
-
-    total_ways = 0
 
     for _, element in ET.iterparse(f):
 
         if element.tag == "way":
             total_ways += 1
-            # Store way_id for further reference in Error messages
+
             way_id = element.attrib["id"]
             w_id.add(way_id)
 
-            # Loop through the fields expected to be int within a certain
-            # range (id, uid, version, changeset) to detect possible problems
             for att in ATTR_INT:
                 v = element.attrib[att]
 
-                # isInt() checks if a number can be casted to integer
                 if not isInt(v):
                     raise ValueError("Invalid attrib.{} in way {}".format(att, way_id))
 
-                # inRange() checks if a number sits between a predefined range
                 if not inRange(v, att):
                     raise ValueError("Detected out of range value for attrib.{} in way {}".format(att, way_id))
 
-            # Timestamp
             tstamp = element.attrib["timestamp"]
 
-            # properDate() checks through a RegEx if a given timestamp follows
-            # the correct format
             if not properDate(tstamp):
                 raise ValueError("Invalid timestamp format in way {}".format(way_id))
 
-            # For each way, loop through all its tags
             for tag in element.iter("tag"):
 
-                # tag_qc() checks if a tag element has 2 attributes (k, v)
-                if not tag_qc(tag):
+                if not tag_has_two(tag):
                     raise ValueError("Tag in way {} had too many attributes".format(way_id))
 
-                # is_street_name() checks if the attribute k="addr:street"
                 if is_street_name(tag):
                     street_name = tag.attrib["v"]
                     audit_street_type(w_street_types, street_name)
 
-                # audit_key_type() looks for format problems in the keys
                 audit_key_type(tag, w_key_types)
 
     if not len(w_id) == total_ways:
         raise ValueError("Found attribte id not unique")
+
+    # ***** LOGS *****
+    # ================
 
     # Prints a list of all the street types found in the data set
     print "\nWAYS: STREET TYPES", "\n", "="*18
@@ -180,6 +174,9 @@ def audit_ways(f):
     print_sorted_dict(w_key_types)
     return
 
+
+# ***** SUPPORT FUNCTIONS *****
+# =============================
 
 def isInt(x):
     try:
@@ -221,7 +218,7 @@ def properDate(v):
     return timestamp1.search(v1) and timestamp2.search(v2)
 
 
-def tag_qc(t):
+def tag_has_two(t):
     EXPECTED_ATTR = ["k", "v"]
     UNEXPECTED_ATTR = []
     for key in t.keys():
@@ -283,6 +280,8 @@ def load_tag_map(t, ks, vs):
     return ks, vs
 
 
+# load_nodes_data() collects each attribute from both nodes and tags into
+# sets. It is only intended for manual testing with the numpy library.
 def load_nodes_data(f):
     for _, element in ET.iterparse(f):
         if element.tag == "node":
