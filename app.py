@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import audit
 import to_csv
-# import to_sql
+import to_sql
+import time
 
-PATH = "../../_data"
-FILE = "bcn.min.osm"
+PATH = "data/"
+FILE = "bcn_sample.osm"
 OSM_PATH = "{}/{}".format(PATH, FILE)
 
 if __name__ == "__main__":
@@ -14,3 +15,5 @@ if __name__ == "__main__":
         # audit.audit_ways(f)
         pass
     to_csv.process_map(OSM_PATH, validate=False)
+    time.sleep(5)
+    to_sql.main()
