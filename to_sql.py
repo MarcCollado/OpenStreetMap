@@ -2,14 +2,11 @@
 import sqlite3
 import csv
 
-sqlite_file = 'osm.db'
+sqlite_file = 'bcn.db'
 conn = sqlite3.connect(sqlite_file)
 conn.text_factory = str
 
 cur = conn.cursor()
-
-# cur.execute('DROP TABLE IF EXISTS node, node_tags, way, way_nodes, way_tags;')
-# conn.commit()
 
 cur.execute('''
     CREATE TABLE node (
@@ -49,6 +46,7 @@ conn.commit()
 with open('output/node_tags.csv', 'rb') as f:
     dr = csv.DictReader(f)
     to_db = [(i['id'], i['key'], i['value'].decode('utf-8'), i['type']) for i in dr]
+
 cur.executemany('INSERT INTO node_tags(id, key, value, type) VALUES (?, ?, ?, ?);', to_db)
 
 conn.commit()
@@ -89,6 +87,7 @@ conn.commit()
 with open('output/way_nodes.csv', 'rb') as f:
     dr = csv.DictReader(f)
     to_db = [(i['id'], i['node_id'], i['position']) for i in dr]
+
 cur.executemany('INSERT INTO way_nodes(id, node_id, position) VALUES (?, ?, ?);', to_db)
 
 conn.commit()
@@ -108,6 +107,7 @@ conn.commit()
 with open('output/way_tags.csv', 'rb') as f:
     dr = csv.DictReader(f)
     to_db = [(i['id'], i['key'], i['value'].decode('utf-8'), i['type']) for i in dr]
+
 cur.executemany('INSERT INTO way_tags(id, key, value, type) VALUES (?, ?, ?, ?);', to_db)
 
 conn.commit()
