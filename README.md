@@ -1,6 +1,8 @@
 # OpenStreetMap
 Data Wrangling Project — Udacity Data Analyst Nanodegree
 
+IMPORTANT: The whole project is documented and explained in the OpenStreetMap.md file.
+
 
 ## Main Scripts
 
