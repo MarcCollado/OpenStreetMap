@@ -260,6 +260,7 @@ way_tags.csv ......  13.9 MB
 way_nodes.cv ......  35.1 MB  
 ```
 
+
 ### Number of nodes
 
 `sqlite> SELECT COUNT(*) FROM node;`
