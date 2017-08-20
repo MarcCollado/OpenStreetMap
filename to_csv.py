@@ -9,11 +9,11 @@ import cerberus
 import fix
 import schema
 
-NODES_PATH = "output/node.csv"
-NODE_TAGS_PATH = "output/node_tags.csv"
-WAYS_PATH = "output/way.csv"
-WAY_NODES_PATH = "output/way_nodes.csv"
-WAY_TAGS_PATH = "output/way_tags.csv"
+NODES_PATH = "data/node.csv"
+NODE_TAGS_PATH = "data/node_tags.csv"
+WAYS_PATH = "data/way.csv"
+WAY_NODES_PATH = "data/way_nodes.csv"
+WAY_TAGS_PATH = "data/way_tags.csv"
 
 LOWER_COLON = re.compile(r'^([a-z]|_)+:([a-z]|_)+')
 PROBLEMCHARS = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
