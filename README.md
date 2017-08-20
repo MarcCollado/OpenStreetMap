@@ -6,7 +6,7 @@ IMPORTANT: The whole project is documented and explained in the OpenStreetMap.md
 
 ## Main Scripts
 
-* `app.py`: calls the rest of the functions and executes the program. By commenting some of the lines, some functionalities can be turned on/off.
+* `app.py`: calls all the functions and executes the program. To create the .csv files and import the data to the database in the `data` folder, just run `python app.py` and the script will take care of the rest. `app.py` can also run `audit.py` functions, but those are commented by default since they don't cause any modification to the data itself.
 
 * `audit.py`: this is the first look at the data. It programmatically checks for data validity, accuracy and other measures and prints its results in the terminal. It does not modify the data itself, only reports the issues it encounters.
 
