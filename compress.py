@@ -2,9 +2,9 @@
 import xml.etree.ElementTree as ET
 
 OSM_FILE = "../../_data/bcn.osm"
-SAMPLE_FILE = "sample.osm"
+SAMPLE_FILE = "bcn_sample.osm"
 
-k = 10
+k = 25
 
 
 def get_element(osm_file, tags=('node', 'way', 'relation')):
