@@ -1,4 +1,4 @@
-# OpenStreetMap Data Project
+advantages# OpenStreetMap Data Project
 
 
 ### Map Area
@@ -429,7 +429,7 @@ Further development could compare how different categories change depending on t
 
 By far the most challenging — and also annoying, problem I have encountered wrangling the data has been the validity and consistency of each data point.
 
-The fact users are contributing each piece of data, makes it virtually impossible to ensure data quality. For example, this is a chunk of a query displaying cities in the metro area:
+The fact users are contributing on each piece of data, makes it virtually impossible to ensure data quality across the board. For example, this is a chunk of a query displaying cities in the metro area:
 
 ```
 St. Feliu
@@ -440,17 +440,37 @@ sant Feliu de llob.
 sant feliu de llobregat
 ```
 
-Note that the name we are looking for is "Sant Feliu de Llobregat", but carelessness when it comes to report the data is consistently messing up with the results.
+Note that the name we are looking for is `Sant Feliu de Llobregat`, but different users uploading data without clear rules on format or style, creates a lot of problems afterwords when it comes to wrangle and visualize the data. In other words, carelessness reporting the data is consistently messing up with the results.
 
-I could address some of the problems in `audit.py` and `to_csv.py`, but the deepness of the data makes it really difficult to programmatically track down each input.
+Of course some of this problems can be addressed - up to some point, in `audit.py` and `to_csv.py`, but the deepness of the data makes it really difficult to programmatically track down each input.
 
-My suggestion would definitely come in the form of pre-validation for data entries. I don't think that would fix 100% of the problems, but at least these simple measures would account for a much cleaner dataset:
+My suggestion would definitely come in the form of pre-validation for data entries. It won't definitely fix 100% of the problems, but at least it would address the low hanging fruit, and these simple measures would account for a much cleaner dataset:
 
-* Data type: if a value has to be an integer, ban the possibility of reporting a string. See for example the case with latitude or max_speed.
-* Range: if it is known that a value has to be within a predetermined range, flag the ones outside.
-* Autocompletion or "did you mean...": if there are 3.000 entries under the key "Barcelona", once a "b" is typed, show a dropdown with the most possible outcomes.
+* Data type: if a value has to be an integer, ban the possibility of reporting a string. See for example the case with `latitude` or `max_speed`.
+* Range: if it is known that a value has to be within a predetermined range, flag the ones outside. The example of `latitude & longitude` also holds here. If you know in advance that the data should fit within a certain range, it wouldn't make any sense to permit the uploading of something outside this range.
+* Autocompletion or "did you mean...": if there are 3.000 entries under the key "Barcelona", when a user wants to upload a new one, once a "b" is typed, show a dropdown with the most possible outcomes.
 
-The data was properly cleaned for the exercise purposes, but it the whole set was incomplete and messier than I thought when I started. The most I tinkered with it, the most I discovered flaws and data problems that couldn't be fixed programatically. This is the ultimate reason why I think this improvement would make a lot of difference.
+
+### The pros and cons
+
+There is no doubt that such measure would improve maintain consistency and accuracy of the inputs across the board. During the project I have encountered plenty of "easy wins" that could be potentially fixed or addressed with little effort thanks to pre-validation rules.
+
+From all the data I have been encountering and wrangling during the project, which might be still a rather limited and subjective point of view, I can confirm that most of the issues came from this particular problem. Therefore, the advantages of addressing it are rather obvious since the quality of the data from a validity standpoint would clearly improve.
+
+On the other hand, the implementation of such feature would remove part of the wrangling work, but it would also shift it up the chain in the form of validation.
+
+In order to create these validation mechanisms, it would be necessary to programmatically understand all the data inputs and create a validation plan for each entry point, which by no means is an easy endeavor.
+
+Because of that, there are some considerations that we need to take in consideration before further exploring this option:
+
+* Work would move along the chain, from wrangling to validation, but it would save a lot of time in the long run. That is because if such validation measures are not in place, every single time a data analyst gets the data, she has to go through the wrangling process over and over. But, once pre-validation is in place, all the analysts will reap the benefits "at no additional cost". Therefore, it is more work at the beginning, but pays off with time.
+* The legacy data could be also problematic. The already uploaded data that diverges from the new criteria should be treated as a separated dataset or updated to match the new format.
+
+The way to implement such a feature would be to start with the easy wins, data types and other rather simple validations. And then scale up to more complex measures such as "autocompletion" or "in range" data.
+
+Once these measures are in place, plenty of new development open up. For example, one way to proceed would be to standardize user input through a mobile app, where the entry point of the data is totally controlled, but also allows for two way conversation between the user and the team in charge of validation. This way the user could report flaws or exceptions in the data input, but this discussion is way beyond the project scope.
+
+But back to Barcelona, the ultimate reason why I think this improvement would make a lot of difference is because although the data was properly cleaned for the exercise purposes, the whole set was incomplete and messier than I thought when I started. The most I tinkered with it, the most I discovered flaws and data problems that couldn't be fixed programmatically, and pre-validation measures will definitely address plenty of those.
 
 ---
 [1] In the final version of the code, the uncaught errors handling process has been updated to save all the misfits in a set() rather than printing each result one by one.
