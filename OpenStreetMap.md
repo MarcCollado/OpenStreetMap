@@ -1,6 +1,4 @@
-advantages# OpenStreetMap Data Project
-
-
+# OpenStreetMap Data Project
 ### Map Area
 
 Barcelona, Barcelona, Spain
@@ -257,7 +255,7 @@ node.csv ..........  93.6 MB
 node_tags.csv .....   8.4 MB
 way.csv ...........   8.8 MB
 way_tags.csv ......  13.9 MB
-way_nodes.cv ......  35.1 MB  
+way_nodes.cv ......  35.1 MB
 ```
 
 

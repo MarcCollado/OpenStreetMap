@@ -1,7 +1,15 @@
 # OpenStreetMap
 Data Wrangling Project — Udacity Data Analyst Nanodegree
 
-**Important:** The whole project is documented and explained in the `OpenStreetMap.md` file.
+This project is part of the Data Analyst Nanodegree. Below you'll find the rest of the projects and I also wrote a [short post](https://collado.io/blog/2018/udacity-dand) about the experience.
+
+* [Exploratory data analysis](https://github.com/MarcCollado/wine)
+* [Data wrangling](https://github.com/MarcCollado/open-street-map)
+* [Machine learning](https://github.com/MarcCollado/enron)
+* [Data visualization](https://public.tableau.com/profile/marccollado#!/vizhome/TitanicFinal_6/Titanic)
+
+
+**Important note:** The entire project is documented and explained in the [`OpenStreetMap.md`](https://github.com/MarcCollado/enron) file, I encourage you to start there :)
 
 
 ## Main Scripts
