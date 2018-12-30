@@ -16,6 +16,7 @@ This project belongs to Udacity's Data Analyst Nanodegree. Below you'll find the
 The project was built with:
 
 * Python 2.7
+* [NumPy](http://www.numpy.org/)
 * SQL Database
 
 
