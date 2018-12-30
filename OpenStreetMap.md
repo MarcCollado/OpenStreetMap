@@ -1,6 +1,5 @@
 # OpenStreetMap Data Project
 ### Map Area
-
 Barcelona, Barcelona, Spain
 
 According to Wikipedia, [Barcelona](https://en.wikipedia.org/wiki/Barcelona) is *"the capital city of the autonomous community of Catalonia in the Kingdom of Spain, as well as the country's second most populous municipality, with a population of 1.6 million within city limits".*
@@ -16,7 +15,6 @@ The downloaded data was provided directly by Mapzen, since the area I intended t
 
 
 ## Project Outline
-
 The project consists of three distinct parts:
 
 * **Visualize and audit:** carried out by the `audit.py`, this section is intended to make sense of the data as a whole and assess its quality. This routine will programmatically check for data validity, accuracy and other measures seen throughout the course materials.
@@ -25,16 +23,13 @@ The project consists of three distinct parts:
 
 
 ## Part I: Visualize and Audit
-
 In this part the data will be mapped out and visualized, programmatically checking for possible quality flaws. At the end of the day the data should be ready to fit a structure that will look like the schema found at `schema.py`.
 
 The audit process will be mainly concerned by two data points: nodes and ways. Each element also contains relevant information within, that will be kept and translated to aforementioned data structure.
 
 Regardless the sample file reveals most fields are self descriptive, they will be further analyzed one by one to understand the data behind them and watch out for quality issues.
 
-
 ### Auditing nodes
-
 The node element can be found across the data file under the `<node></node>` tag, here's a sample:
 
 ```
@@ -78,9 +73,7 @@ Next up are tags within each node. A quick glimpse at the data reveals that each
 
 `audit_nodes()` will create an ordered list with all the possible street values and also look for the nature of each key: lowercase, colons, but also problematic characters.
 
-
 ### Auditing ways
-
 After the audit of the nodes, checking for ways is rather easy since both data structures share most of the elements and schema.
 
 Regardless, the function `audit_ways()`, which is a carbon copy of its brother `audit_nodes()` and rely on the same helper functions, goes through the same process seen in Auditing Nodes.
@@ -120,16 +113,13 @@ According to the `schema.py`, ways will be mapped to the following schema:
         * value
         * type
 
-
 ### Other checks
-
 Finally, using a combination of the lighter `quick_print()` and `load_nodes_data()` functions, the data coming from all the tags containing the value "addr" will be evaluated for consistency.
 
 The routine will be looking for `postcode` of 5 digits, starting with `08` (which belong to the Barcelona metro area), `city` names properly capitalized and belonging to the metro area, `housenumber` matching integers and so forth.
 
 
 ## Part II: Export and fix
-
 After the programatic check performed by `audit.py` in the Barcelona area map, five types of problems have shown up:
 
 * Language inconsistency for street types under the second level tag `addr:street` (*Avinguda* vs. *Avenida*)
@@ -138,9 +128,7 @@ After the programatic check performed by `audit.py` in the Barcelona area map, f
 * Cities `addr:city` out of range of the Barcelona metropolitan area.
 * Incorrect postal code: Barcelona area postal codes begin with 08XXX, but found some outside this range.
 
-
 ### Language inconsistency
-
 Because Barcelona has two official languages coexisting at the same time, is it possible to find some street prefixes still written in Spanish. Regardless the actual name remains the same, the city council enforces all the street prefixes to be written in Catalan, and that's exactly what `fix_lang()` does.
 
 ```
@@ -154,18 +142,14 @@ It takes in the street name and street type, and then references LANG_MAPPING, a
 
 For example, the entries such *"Avenida Diagonal"* become *"Avinguda Diagonal".*
 
-
 ### Street types: format problems
-
 The data contained several format problems, like over­abbreviation, typos and incorrect naming.
 
 First the data was screened with regular expressions and data type validation through `audit.py`. Once there was a clear view of the problems the data presented, they got fixed through `fix.py` functions, called via the `shape_element()` function found in `to_csv.py`.
 
 Finally, `fix.py` also implements some "hard-coded" data, such as `EXPECTED` or `MAPPING` to manually fix the errors not caught by the programatic functions. This sets are being updated in real time as more rare cases appear.
 
-
 ### Incorrect postal codes
-
 The data also included some cities and postal codes outside the Barcelona area. All the postal codes from Barcelona have 5 digits and start with "08". During the data prep before exporting to the csv files, the data is programmatically checked and flagged as `None` in case a wrong postal code is found.
 
 ```
@@ -206,9 +190,7 @@ Sant Fost de Campsentelles  60
 Ripollet                    58
 ```
 
-
 ### Street type omission and uncaught errors
-
 Once all the data has been filtered and processed, the last step is to find rare gems that were uncaught during the process and then, manually act on those by editing the data or creating an additional feature or function to deal with these edge cases.
 
 The `shape_element()` function is structured as a drip and starts filtering case by case:
@@ -242,12 +224,9 @@ All the situations that were not properly filtered are set apart and printed in 
 
 
 ## Part III: Visualizing the Data
-
 This section contains basic statistics and insights of the dataset, the queries used to gather them, and some additional ideas.
 
-
 ### File sizes
-
 ```
 bcn.osm ........... 255.1 MB
 bcn.db ............ 141.9 MB
@@ -260,21 +239,16 @@ way_nodes.cv ......  35.1 MB
 
 
 ### Number of nodes
-
 `sqlite> SELECT COUNT(*) FROM node;`
 
 1130797
 
-
 ### Number of ways
-
 `sqlite> SELECT COUNT(*) FROM way;`
 
 143652
 
-
 ### Cities in the metro area
-
 ```
 sqlite>
 SELECT COUNT(*)
@@ -291,7 +265,6 @@ The query above revealed that there are 32 cities in the metro area with more th
 
 
 ### Number of unique users
-
 ```
 sqlite>
 SELECT COUNT(DISTINCT(u.uid))
@@ -301,9 +274,7 @@ SELECT uid FROM way) as u;
 
 2753
 
-
 ### Top contributors
-
 ```
 sqlite>
 SELECT u.user, COUNT(*) as count
@@ -346,9 +317,7 @@ FROM (SELECT u.user, COUNT(*) as count
 ```
 
 ## In-depth Analysis
-
 ### Max. Speed
-
 A few years ago all the streets in Barcelona were limited to 50km/h. But a recent effort from the city council to reduce the number of cars populating the streets of the city, there's been a big campaign to reduce the maximum speed from 50 down to 30 km/h.
 
 ```
@@ -388,9 +357,7 @@ def inBCN(lat, lon):
 
 It also revealed another validity error in the case of `sign`, that could be avoided in `audit_nodes()` as well, filtering by data type `int`.
 
-
 ### And finally, tourism
-
 Yet another controversial issue in Barcelona these recent years has been undoubtedly tourism. In just a few years the city has been transformed from a local town to an European capital, hosting millions of tourists per year.
 
 For this reason this last query breaks down the twenty most common type of shops per category:
@@ -424,7 +391,6 @@ Further development could compare how different categories change depending on t
 
 
 ## Additional Improvements
-
 By far the most challenging — and also annoying, problem I have encountered wrangling the data has been the validity and consistency of each data point.
 
 The fact users are contributing on each piece of data, makes it virtually impossible to ensure data quality across the board. For example, this is a chunk of a query displaying cities in the metro area:
@@ -448,9 +414,7 @@ My suggestion would definitely come in the form of pre-validation for data entri
 * Range: if it is known that a value has to be within a predetermined range, flag the ones outside. The example of `latitude & longitude` also holds here. If you know in advance that the data should fit within a certain range, it wouldn't make any sense to permit the uploading of something outside this range.
 * Autocompletion or "did you mean...": if there are 3.000 entries under the key "Barcelona", when a user wants to upload a new one, once a "b" is typed, show a dropdown with the most possible outcomes.
 
-
 ### The pros and cons
-
 There is no doubt that such measure would improve maintain consistency and accuracy of the inputs across the board. During the project I have encountered plenty of "easy wins" that could be potentially fixed or addressed with little effort thanks to pre-validation rules.
 
 From all the data I have been encountering and wrangling during the project, which might be still a rather limited and subjective point of view, I can confirm that most of the issues came from this particular problem. Therefore, the advantages of addressing it are rather obvious since the quality of the data from a validity standpoint would clearly improve.
